@@ -2,6 +2,7 @@
 #include <SDL2/SDL_image.h>
 #include <string>
 #include <iostream>
+#include "bomb.h"
 
 class bullet;
 class player;
@@ -26,4 +27,5 @@ class game{
 		SDL_Renderer* gameRenderer;
 		static game* instance;
   		static bool projectileCollision(player p, bullet* b);
+		static bool projectileExploded ( player p, bomb * b );
 };

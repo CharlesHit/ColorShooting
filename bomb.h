@@ -15,15 +15,17 @@ class bomb
 {
 
 public:
-	bomb ( player * p, playerTexture * pTxt );
+	bomb ( player * p, playerTexture * pTxt, playerTexture * fTxt );
 
 	~bomb () = default;
 
 	void handleInput ( SDL_Event &event, int direction );
 
-	void launch ( int xPos, int yPos );
+	int launch ( int xPos, int yPos );
 
 	void render ( SDL_Renderer *&rend );
+
+	void flame_render ( SDL_Renderer *&rend );
 
 	int getX ();
 
@@ -33,16 +35,23 @@ public:
 
 	int getWidth ();
 
+	int getRange ();
+
+	int getDistance();
+
 private:
 	int width;
 	int height;
+	const int range = 300; // range of bomb
 	int velocity = 10;
-	int range = 3;
+	const int MAX_DISTANCE = 500;
+	int distance;
 	int xPosition;
 	int yPosition;
 	int xMovement;
 	int yMovement;
 	playerTexture * pTexture;
+	playerTexture * flameTexture;
 };
 
 #endif //TEAM16_BOMB_H

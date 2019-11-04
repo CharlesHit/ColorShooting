@@ -5,6 +5,7 @@
 
 #include "game.h"
 #include "bullet.h"
+#include "bomb.h"
 #include "health.h"
 #include <vector>
 
@@ -12,6 +13,9 @@ bool instanceFlag = false;
 game* game::instance = nullptr;
 
 const int damage = 10;
+const int bomb_damage = 30;
+
+const int STAY = 100;
 
 /**
  * initializes the game screen
@@ -130,6 +134,7 @@ void game::run(){
     playerTexture oneTexture;
     playerTexture twoTexture;
     playerTexture projectile;
+	playerTexture flameTexture; // for bomb
     
     HealthTexture hp_red_texture;
     HealthTexture hp1_texture;
@@ -138,6 +143,7 @@ void game::run(){
     oneTexture.loadImage("player1.bmp", gameRenderer);
     twoTexture.loadImage("player2.bmp", gameRenderer);
     projectile.loadImage("dot.bmp", gameRenderer);
+	flameTexture.loadImage("flame.bmp", gameRenderer);
     hp_red_texture.loadImage("player1.bmp", gameRenderer);
     hp1_texture.loadImage("player1.bmp", gameRenderer);
     hp2_texture.loadImage("player1.bmp", gameRenderer);
@@ -151,13 +157,22 @@ void game::run(){
     Health hp2_red(SCREEN_WIDTH - 300, 50, &hp_red_texture);
     Health hp1_green(50, 50, &hp1_texture);
     Health hp2_green(SCREEN_WIDTH - 300, 50, &hp2_texture);
-    
+
+	// instance of BULLET
     std::vector<bullet*> p1bullets;
     std::vector<bullet*> p2bullets;
     std::vector<bool> p1bool;
     std::vector<bool> p2bool;
     bullet* p1bullet = nullptr;
     bullet* p2bullet = nullptr;
+
+	// instance of BOMB
+	std::vector<bomb*> p1bomb_list;
+	std::vector<bomb*> p2bomb_list;
+	std::vector<bool> p1_bomb_bool;
+	std::vector<bool> p2_bomb_bool;
+	bomb* p1bomb = nullptr;
+	bomb* p2bomb = nullptr;
 
     bool quit = false;
     SDL_Event event;
@@ -173,7 +188,11 @@ void game::run(){
     int PlayerTwoaccumulator = 0;
   
     //While user does not quit
-    while( !quit ){
+	bool stay_1_bool = false;
+	int stay_1_time = STAY;
+	bool stay_2_bool = false;
+	int stay_2_time = STAY;
+	while( !quit ){
         
         int p1XPos = square1.getXCoord();
         int p1YPos = square1.getYCoord();
@@ -209,7 +228,7 @@ void game::run(){
                 square2.handleMoveEvent(event);
             }
             
-            
+            // bullet, play2, q
             else if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q && PlayerOneaccumulator > 500){
                 PlayerOneaccumulator -= 500;
                 p2bullet = new bullet(square2.getXCoord(), square2.getYCoord(), &projectile);
@@ -218,7 +237,18 @@ void game::run(){
                 p2bullets.push_back(p2bullet);
                 p2bool.push_back(true);
             }
-            
+
+            // bomb, play2, e
+            else if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_e && PlayerOneaccumulator > 500){
+	            PlayerOneaccumulator -= 500;
+	            p2bomb = new bomb(&square2, &projectile, &flameTexture);
+	            (*p2bomb).handleInput(event, square2.getDirection());
+	            (*p2bomb).launch(p2XPos,p2YPos);
+	            p2bomb_list.push_back(p2bomb);
+	            p2_bomb_bool.push_back(true);
+            }
+
+
             else if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_u && PlayerTwoaccumulator > 500){
                 PlayerTwoaccumulator -= 500;
                 p1bullet = new bullet(square1.getXCoord(), square1.getYCoord(), &projectile);
@@ -226,6 +256,16 @@ void game::run(){
                 (*p1bullet).shoot(p1XPos,p1YPos);
                 p1bullets.push_back(p1bullet);
                 p1bool.push_back(true);
+            }
+
+            // bomb, play1, o
+            else if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o && PlayerOneaccumulator > 500){
+	            PlayerOneaccumulator -= 500;
+	            p1bomb = new bomb(&square1, &projectile, &flameTexture);
+	            (*p1bomb).handleInput(event, square1.getDirection());
+	            (*p1bomb).launch(p1XPos,p1YPos);
+	            p1bomb_list.push_back(p1bomb);
+	            p1_bomb_bool.push_back(true);
             }
         }
 
@@ -345,6 +385,96 @@ void game::run(){
             }
         }
 
+		// loop BUMB p1
+		int x_1, y_1;
+		if(stay_1_bool && stay_1_time > 0)
+		{
+			(flameTexture).render(x_1, y_1, gameRenderer);
+			stay_1_time--;
+		} if(stay_1_time == 0)
+		{
+			stay_1_bool = false; stay_1_time = STAY;
+		}
+		for (int i = 0; i < (int)p1_bomb_bool.size(); i++) {
+			if( p1_bomb_bool[i] ){
+				// in bumb, largest flying distance is MAX distance
+				if((*p1bomb_list[i]).launch((*p1bomb_list[i]).getX(), (*p1bomb_list[i]).getY()) == 0)
+				{
+					p1_bomb_bool[i] = false;
+					if (projectileExploded(square2, p1bomb_list[i])) {
+						square2.setHealth(square2.getHealth() - bomb_damage);
+						std::cout << "Player 2 took " << bomb_damage << " damage: " << square2.getHealth() << std::endl;
+						hp1_texture.setWidth(hp1_texture.getHpWidth()  - 25 * 3);
+					}
+				}
+
+				if (((*p1bomb_list[i]).getY() < 0 || (*p1bomb_list[i]).getY() + (*p1bomb_list[i]).getHeight() > SCREEN_HEIGHT)
+				    || ((*p1bomb_list[i]).getX() < 0 || (*p1bomb_list[i]).getX() + (*p1bomb_list[i]).getWidth()  > SCREEN_WIDTH)){
+					p1_bomb_bool[i] = false;
+					if (projectileExploded(square1, p1bomb_list[i])) {
+						square2.setHealth(square2.getHealth() - bomb_damage);
+						std::cout << "Player 2 took " << bomb_damage << " damage: " << square2.getHealth() << std::endl;
+						hp1_texture.setWidth(hp1_texture.getHpWidth()  - 25 * 3);
+					}
+				}
+
+				if( !p1_bomb_bool[i] ){
+					x_1 = p1bomb_list[i]->getX(); y_1 = p1bomb_list[i]->getY();
+					stay_1_bool = true;
+					delete p1bomb_list[i];
+				}
+
+				if(p1_bomb_bool[i]){
+					(*p1bomb_list[i]).render(gameRenderer);
+				}
+			}
+		}
+
+	    // loop BUMB p2
+	    int x_2, y_2;
+	    if(stay_2_bool && stay_2_time > 0)
+	    {
+		    (flameTexture).render(x_2, y_2, gameRenderer);
+		    stay_2_time--;
+	    } if(stay_2_time == 0)
+		{
+			stay_2_bool = false; stay_2_time = STAY;
+		}
+	    for (int i = 0; i < (int)p2_bomb_bool.size(); i++) {
+		    if( p2_bomb_bool[i] ){
+			    // in bumb, largest flying distance is MAX distance
+			    if((*p2bomb_list[i]).launch((*p2bomb_list[i]).getX(), (*p2bomb_list[i]).getY()) == 0)
+			    {
+				    p2_bomb_bool[i] = false;
+				    if (projectileExploded(square1, p2bomb_list[i])) {
+					    square1.setHealth(square1.getHealth() - bomb_damage);
+					    std::cout << "Player 1 took " << bomb_damage << " damage: " << square1.getHealth() << std::endl;
+					    hp2_texture.setWidth(hp2_texture.getHpWidth()  - 25 * 3);
+				    }
+			    }
+
+			    if (((*p2bomb_list[i]).getY() < 0 || (*p2bomb_list[i]).getY() + (*p2bomb_list[i]).getHeight() > SCREEN_HEIGHT)
+			        || ((*p2bomb_list[i]).getX() < 0 || (*p2bomb_list[i]).getX() + (*p2bomb_list[i]).getWidth()  > SCREEN_WIDTH)){
+				    p2_bomb_bool[i] = false;
+				    if (projectileExploded(square1, p2bomb_list[i])) {
+					    square1.setHealth(square1.getHealth() - bomb_damage);
+					    std::cout << "Player 1 took " << bomb_damage << " damage: " << square1.getHealth() << std::endl;
+					    hp2_texture.setWidth(hp2_texture.getHpWidth()  - 25 * 3);
+				    }
+			    }
+
+			    if( !p2_bomb_bool[i] ){
+			    	x_2 = p2bomb_list[i]->getX(); y_2 = p2bomb_list[i]->getY();
+			    	stay_2_bool = true;
+				    delete p2bomb_list[i];
+			    }
+
+			    if(p2_bomb_bool[i]){
+				    (*p2bomb_list[i]).render(gameRenderer);
+			    }
+		    }
+	    }
+
         //Update the game screen
         SDL_RenderPresent(gameRenderer);
     }
@@ -372,6 +502,14 @@ bool game::projectileCollision(player p, bullet* b) {
 	       p.getYCoord() <= b->getY() + b->getHeight() &&
 	       p.getYCoord() + p.getHeight() >= b->getY();
 
+}
+
+// Checks if there is a collision between a player and a bullet
+bool game::projectileExploded(player p, bomb* b) {
+	std::cout << ((b->getX() - p.getXCoord())*(b->getX() - p.getXCoord()) + (b->getY() - p.getYCoord())*(b->getY() - p.getYCoord())) << std::endl;
+	std::cout << b->getRange()*b->getRange() << std::endl;
+	return ((b->getX() - p.getXCoord())*(b->getX() - p.getXCoord()) + (b->getY() - p.getYCoord())*(b->getY() - p.getYCoord()))
+	<= b->getRange()*b->getRange();
 }
 
 /**
