@@ -29,7 +29,7 @@ bullet::bullet(int xPos, int yPos,playerTexture* pTxt)
  * Destructor for the bullet class
  */
 bullet::~bullet(){
-    pTexture = NULL;
+    pTexture = nullptr;
     width = 0;
     height = 0;
     xPosition = 0;

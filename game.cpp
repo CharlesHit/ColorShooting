@@ -1,5 +1,6 @@
 //
 // Created by Christopher Xu on 2019-10-26.
+// Reviewed by Charles on 2019-11-4.
 //
 
 #include "game.h"
@@ -8,9 +9,9 @@
 #include <vector>
 
 bool instanceFlag = false;
-game* game::instance = NULL;
+game* game::instance = nullptr;
 
-int damage = 10;
+const int damage = 10;
 
 /**
  * initializes the game screen
@@ -18,21 +19,20 @@ int damage = 10;
 game::game(){
     SCREEN_WIDTH = 1366;
     SCREEN_HEIGHT = 768;
-    gameWindow = NULL;
-    gameScreenSurface = NULL;
-    gameRenderer = NULL;
+    gameWindow = nullptr;
+    gameRenderer = nullptr;
 }
 
 /**
  * destructor for game class
  */
 game::~game(){
-    //closing out and destoying everything
+    //closing out and destroying everything
     instanceFlag = false;
     SDL_DestroyWindow(gameWindow);
     SDL_DestroyRenderer(gameRenderer);
-    gameWindow = NULL;
-    gameRenderer = NULL;
+    gameWindow = nullptr;
+    gameRenderer = nullptr;
     SDL_Quit();
 }
 
@@ -75,17 +75,12 @@ bool game::checkCollision(player player1, player player2)
     rightp2 = player2.getXCoord() + player2.getWidth();
     topp2 = player2.getYCoord();
     bottomp2 = player2.getYCoord() + player2.getHeight();
-    
-    if ((leftp1 <= leftp2 + player2.getWidth()) &&
-        (leftp1 + player1.getWidth() >= leftp2) &&
-        (topp1 <= topp2 + player2.getHeight()) &&
-        (player1.getHeight()+ topp1 >= topp2))
-    {
-        return true;
-    }
 
-    return false;
-    
+	return ( leftp1 <= leftp2 + player2.getWidth()) &&
+	       ( leftp1 + player1.getWidth() >= leftp2 ) &&
+	       ( topp1 <= topp2 + player2.getHeight()) &&
+	       ( player1.getHeight() + topp1 >= topp2 );
+
 }
 
 /**
@@ -106,7 +101,7 @@ bool game::init(){
         gameWindow = SDL_CreateWindow( "Two Player Shooter", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 
         //Check that the window was created properly
-        if( gameWindow == NULL ){
+        if( gameWindow == nullptr ){
             std::cout << "The game window could not be created";
             return false;
         }
@@ -161,8 +156,8 @@ void game::run(){
     std::vector<bullet*> p2bullets;
     std::vector<bool> p1bool;
     std::vector<bool> p2bool;
-    bullet* p1bullet = NULL;
-    bullet* p2bullet = NULL;
+    bullet* p1bullet = nullptr;
+    bullet* p2bullet = nullptr;
 
     bool quit = false;
     SDL_Event event;
@@ -237,7 +232,7 @@ void game::run(){
         square1.move();
         square2.move();
       
-        if (checkCollision(square1,square2) == true)
+        if ( checkCollision(square1, square2))
         {
             p1XPos = square1.getXCoord();
             p1YPos = square1.getYCoord();
@@ -277,8 +272,8 @@ void game::run(){
         }
         
         // Loops through all of player 1's bullets and updates each one individually 
-        for (int i = 0; i < p1bullets.size(); i++) {
-            if(p1bool[i] == true){
+        for (int i = 0; i < (int)p1bullets.size(); i++) {
+            if( p1bool[i] ){
                 (*p1bullets[i]).shoot((*p1bullets[i]).getX(), (*p1bullets[i]).getY());
                 
                 if ((*p1bullets[i]).getY() < 0 || (*p1bullets[i]).getY() + (*p1bullets[i]).getHeight() > SCREEN_HEIGHT || projectileCollision(square2, p1bullets[i])){
@@ -302,9 +297,9 @@ void game::run(){
                     }
                 }
                 
-                if(p1bool[i] == false){
+                if( !p1bool[i] ){
                     delete p1bullets[i];
-                    p1bullets[i] = NULL;
+                    p1bullets[i] = nullptr;
                 }
                 
                 else{
@@ -314,8 +309,8 @@ void game::run(){
         }
         
         // Loops through all of player 2's bullets and updates each one individually 
-        for (int i = 0; i < p2bullets.size(); i++) {
-            if(p2bool[i] == true){
+        for (int i = 0; i < (int)p2bullets.size(); i++) {
+            if( p2bool[i] ){
                 (*p2bullets[i]).shoot((*p2bullets[i]).getX(), (*p2bullets[i]).getY());
                 
                 if ((*p2bullets[i]).getY() < 0 || (*p2bullets[i]).getY() + (*p2bullets[i]).getHeight() > SCREEN_HEIGHT || projectileCollision(square1, p2bullets[i])){
@@ -339,9 +334,9 @@ void game::run(){
 
                 }
                 
-                if(p2bool[i] == false){
+                if(!p2bool[i]){
                     delete p2bullets[i];
-                    p2bullets[i] = NULL;
+                    p2bullets[i] = nullptr;
                 }
                 
                 else{
@@ -372,16 +367,11 @@ int game::getScrnWidth(){
 
 // Checks if there is a collision between a player and a bullet
 bool game::projectileCollision(player p, bullet* b) {
-    if (p.getXCoord() <= b -> getX() + b -> getWidth() && // Checks if player is to the left of bullet
-        p.getXCoord() + p.getWidth() >= b -> getX() && // Checks if player is to the right of bullet
-        p.getYCoord() <= b -> getY() + b -> getHeight() &&
-        p.getYCoord() + p.getHeight() >= b -> getY()) 
-        {
-            return true;
-        }
-    
-    return false;
-    
+	return p.getXCoord() <= b->getX() + b->getWidth() && // Checks if player is to the left of bullet
+	       p.getXCoord() + p.getWidth() >= b->getX() && // Checks if player is to the right of bullet
+	       p.getYCoord() <= b->getY() + b->getHeight() &&
+	       p.getYCoord() + p.getHeight() >= b->getY();
+
 }
 
 /**
@@ -392,7 +382,8 @@ bool game::projectileCollision(player p, bullet* b) {
  */
 int main( int argc, char* args[] ){
 
-    game* currentGame = (*currentGame).getInstance();
+	game* currentGame = nullptr;
+    currentGame = (*currentGame).getInstance();
 
     if( !(*currentGame).init() ){
         std::cout << "Failed to initialize, program is exiting.\n";

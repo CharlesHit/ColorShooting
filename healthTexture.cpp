@@ -4,7 +4,7 @@
  * initializes object of class Health Texture
  */
 HealthTexture::HealthTexture(){
-	hpTexture = NULL;
+	hpTexture = nullptr;
 	hpWidth = 0;
 	hpHeight = 0;
 }
@@ -20,9 +20,9 @@ HealthTexture::~HealthTexture(){
  * frees memory
  */
 void HealthTexture::free(){
-	if(hpTexture != NULL){
+	if(hpTexture != nullptr){
 		SDL_DestroyTexture(hpTexture);
-		hpTexture = NULL;
+		hpTexture = nullptr;
 		hpWidth = 0;
 		hpHeight = 0;
 	}
@@ -39,14 +39,14 @@ int HealthTexture::loadImage(std::string image, SDL_Renderer*& rend){
 	free();
 	SDL_Texture* newTexture;
 	SDL_Surface* toLoad = IMG_Load(image.c_str());
-	if(toLoad == NULL){
+	if(toLoad == nullptr){
 		return(-1);
 	}
 	
 	SDL_SetColorKey(toLoad, SDL_TRUE, SDL_MapRGB((*toLoad).format, 0, 0xFF, 0xFF));
 	
 	newTexture = SDL_CreateTextureFromSurface(rend, toLoad);
-	if(newTexture == NULL){
+	if(newTexture == nullptr){
 		return(-2);
 	}
 	
@@ -68,7 +68,7 @@ int HealthTexture::loadImage(std::string image, SDL_Renderer*& rend){
  */
 void HealthTexture::render(int x, int y, SDL_Renderer*& rend){
 	SDL_Rect toRender = {x, y, hpWidth, hpHeight};
-	SDL_RenderCopyEx(rend, hpTexture, NULL, &toRender, 0, NULL, SDL_FLIP_NONE);
+	SDL_RenderCopyEx(rend, hpTexture, nullptr, &toRender, 0, nullptr, SDL_FLIP_NONE);
 }
 
 /**

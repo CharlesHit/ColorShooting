@@ -8,7 +8,7 @@
  * constructor for playerTexture
  */
 playerTexture::playerTexture(){
-	gameTexture = NULL;
+	gameTexture = nullptr;
 	txtHeight = 0;
 	txtWidth = 0;
 	
@@ -26,9 +26,9 @@ playerTexture::~playerTexture(){
  */
 void playerTexture::free(){
 	
-	if(gameTexture != NULL){
+	if(gameTexture != nullptr){
 		SDL_DestroyTexture(gameTexture);
-		gameTexture = NULL;
+		gameTexture = nullptr;
 		txtHeight = 0;
 		txtWidth = 0;
 	}
@@ -45,14 +45,14 @@ int playerTexture::loadImage(std::string image, SDL_Renderer*& rend){
 	free();
 	SDL_Texture* newTexture;
 	SDL_Surface* toLoad = IMG_Load(image.c_str());
-	if(toLoad == NULL){
+	if(toLoad == nullptr){
 		return(-1);
 	}
 	
 	SDL_SetColorKey(toLoad, SDL_TRUE, SDL_MapRGB((*toLoad).format, 0, 0xFF, 0xFF));
 	
 	newTexture = SDL_CreateTextureFromSurface(rend, toLoad);
-	if(newTexture == NULL){
+	if(newTexture == nullptr){
 		return(-2);
 	}
 	
@@ -75,7 +75,7 @@ int playerTexture::loadImage(std::string image, SDL_Renderer*& rend){
 void playerTexture::render(int x, int y, SDL_Renderer*& rend){
 	
 	SDL_Rect toRender = {x, y, txtWidth, txtHeight};
-	SDL_RenderCopyEx(rend, gameTexture, NULL, &toRender, 0, NULL, SDL_FLIP_NONE);
+	SDL_RenderCopyEx(rend, gameTexture, nullptr, &toRender, 0, nullptr, SDL_FLIP_NONE);
 }
 
 /**
