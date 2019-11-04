@@ -21,7 +21,7 @@ find_library(1_LIB SDL2)
 find_library(2_LIB SDL2_image)
 find_library(3_LIB SDL2_ttf)
 
-add_executable(team16  text.cpp game.cpp player.cpp playerTexture.cpp bullet.cpp health.cpp healthTexture.cpp bomb.cpp bomb.h)
+add_executable(team16  text.cpp game.cpp player.cpp playerTexture.cpp bullet.cpp health.cpp healthTexture.cpp bomb.cpp)
 
 target_link_libraries(team16 "${1_LIB}")
 target_link_libraries(team16 "${2_LIB}")

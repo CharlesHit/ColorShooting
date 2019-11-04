@@ -28,16 +28,7 @@ bullet::bullet(int xPos, int yPos,playerTexture* pTxt)
 /**
  * Destructor for the bullet class
  */
-bullet::~bullet(){
-    pTexture = nullptr;
-    width = 0;
-    height = 0;
-    xPosition = 0;
-    yPosition = 0;
-    xMovement = 0;
-    yMovement = 0;
-    
-}
+bullet::~bullet() = default;
 
 /**
  *

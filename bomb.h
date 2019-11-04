@@ -11,27 +11,38 @@
 #include <vector>
 #include "player.h"
 
-class bullet{
+class bomb
+{
 
 public:
-	bullet(int startX, int startY,playerTexture* pTxt);
-	~bullet();
-	void handleInput(SDL_Event& event, int direction);
-	void shoot(int xPos, int yPos);
-	void render(SDL_Renderer*& rend);
-	int getX();
-	int getY();
-	int getHeight();
-	int getWidth();
+	bomb ( player * p, playerTexture * pTxt );
+
+	~bomb () = default;
+
+	void handleInput ( SDL_Event &event, int direction );
+
+	void launch ( int xPos, int yPos );
+
+	void render ( SDL_Renderer *&rend );
+
+	int getX ();
+
+	int getY ();
+
+	int getHeight ();
+
+	int getWidth ();
 
 private:
 	int width;
 	int height;
-	int velocity = 2;
+	int velocity = 10;
+	int range = 3;
 	int xPosition;
 	int yPosition;
 	int xMovement;
 	int yMovement;
-	playerTexture* pTexture;
+	playerTexture * pTexture;
 };
+
 #endif //TEAM16_BOMB_H
