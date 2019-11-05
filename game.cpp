@@ -389,7 +389,7 @@ void game::run(){
 		int x_1, y_1;
 		if(stay_1_bool && stay_1_time > 0)
 		{
-			(flameTexture).render(x_1, y_1, gameRenderer);
+			(flameTexture).render(x_1, y_1-150, gameRenderer);
 			stay_1_time--;
 		} if(stay_1_time == 0)
 		{
@@ -419,7 +419,9 @@ void game::run(){
 				}
 
 				if( !p1_bomb_bool[i] ){
-					x_1 = p1bomb_list[i]->getX(); y_1 = p1bomb_list[i]->getY();
+					// it means you need to put the center of the graph in the x, y not the left up corner
+					int modification_of_render = p1bomb_list[i]->getRange();
+					x_1 = p1bomb_list[i]->getX() - modification_of_render; y_1 = p1bomb_list[i]->getY();
 					stay_1_bool = true;
 					delete p1bomb_list[i];
 				}
@@ -464,7 +466,8 @@ void game::run(){
 			    }
 
 			    if( !p2_bomb_bool[i] ){
-			    	x_2 = p2bomb_list[i]->getX(); y_2 = p2bomb_list[i]->getY();
+				    int modification_of_render =  p2bomb_list[i]->getRange();
+			    	x_2 = p2bomb_list[i]->getX() - modification_of_render/2; y_2 = p2bomb_list[i]->getY()-modification_of_render/2;
 			    	stay_2_bool = true;
 				    delete p2bomb_list[i];
 			    }
