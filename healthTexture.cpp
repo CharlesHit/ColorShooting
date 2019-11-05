@@ -5,8 +5,6 @@
  */
 HealthTexture::HealthTexture(){
 	hpTexture = nullptr;
-	hpWidth = 0;
-	hpHeight = 0;
 }
 
 /**
@@ -34,7 +32,7 @@ void HealthTexture::free(){
  * @param rend - renderer for health texture
  * @return 0 if success -1 or -2 on error
  */
-int HealthTexture::loadImage(std::string image, SDL_Renderer*& rend){
+int HealthTexture::loadImage(const std::string image, SDL_Renderer*& rend, int HP, int scale){
 	
 	free();
 	SDL_Texture* newTexture;
@@ -49,10 +47,11 @@ int HealthTexture::loadImage(std::string image, SDL_Renderer*& rend){
 	if(newTexture == nullptr){
 		return(-2);
 	}
-	
-	hpWidth = 250;
+
+	scalar = scale;
 	hpHeight = (*toLoad).h;
-	
+	hpWidth = HP * scalar;
+
 	SDL_FreeSurface(toLoad);
 	
 	hpTexture = newTexture;
@@ -91,8 +90,8 @@ int HealthTexture::getHpHeight(){
  *
  * @param width
  */
-void HealthTexture::setWidth(int width) {
-	hpWidth = width;
+void HealthTexture::addWidth( int width) {
+	hpWidth += width * scalar;
 }
 
 /**

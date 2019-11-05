@@ -1,7 +1,11 @@
+#ifndef TEAM16_TEXT_H
+#define TEAM16_TEXT_H
+
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL.h>
 #include <string>
 #include <iostream>
+
 
 class Text {
 	public:
@@ -12,4 +16,5 @@ class Text {
 		SDL_Texture *_text_texture = nullptr;
 		mutable SDL_Rect _text_rect;
 };
+#endif //TEAM16_TEXT_H
 

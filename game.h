@@ -1,3 +1,6 @@
+#ifndef TEAM16_GAME_H
+#define TEAM16_GAME_H
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <string>
@@ -29,3 +32,4 @@ class game{
   		static bool projectileCollision(player p, bullet* b);
 		static bool projectileExploded ( player p, bomb * b );
 };
+#endif //TEAM16_GAME_H

@@ -1,6 +1,8 @@
+#ifndef TEAM16_HEALTH_H
+#define TEAM16_HEALTH_H
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <stdio.h>
 #include <string>
 #include <iostream>
 #include "healthTexture.h"
@@ -8,7 +10,6 @@
 class Health{
 	public:
 		Health(int startX, int startY, HealthTexture* hpTxt);
-		void handleMoveEvent(SDL_Event& event);
 		void render(SDL_Renderer*& rend);
 		int getXCoord();
 		int getYCoord();
@@ -23,3 +24,4 @@ class Health{
 		int height;
 		HealthTexture* hpTexture;
 };
+#endif //TEAM16_HEALTH_H

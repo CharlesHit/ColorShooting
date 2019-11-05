@@ -2,6 +2,9 @@
 // Created by Christopher Xu on 2019-10-26.
 //
 
+#ifndef TEAM16_BULLET_H
+#define TEAM16_BULLET_H
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <string>
@@ -31,3 +34,5 @@ private:
     int yMovement;
     playerTexture* pTexture;
 };
+
+#endif //TEAM16_BULLET_H

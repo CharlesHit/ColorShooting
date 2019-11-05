@@ -16,7 +16,7 @@
 class player{
 
 public:
-    player(int startX, int startY, playerTexture* pTxt);
+    player(int startX, int startY, playerTexture* pTxt, int HP);
     void handleMoveEvent(SDL_Event& event);
     void move();
     void render(SDL_Renderer*& rend);

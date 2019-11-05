@@ -16,7 +16,7 @@ const int RIGHT = 3;
  * @param startY - y coordinates of player
  * @param pTxt - player texture of player
  */
-player::player(int startX, int startY, playerTexture* pTxt){
+player::player(int startX, int startY, playerTexture* pTxt, int HP){
 	pTexture = pTxt;
 	width = (*pTexture).getTxtWidth();
 	height = (*pTexture).getTxtWidth();
@@ -26,7 +26,7 @@ player::player(int startX, int startY, playerTexture* pTxt){
 	yMovement = 0;
 	direction = 0;
 	cooldown = 0;
-	health = 100;
+	health = HP;
 }
 
 /**

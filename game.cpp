@@ -3,17 +3,24 @@
 // Reviewed by Charles on 2019-11-4.
 //
 
+#include <vector>
+
 #include "game.h"
 #include "bullet.h"
 #include "bomb.h"
 #include "health.h"
-#include <vector>
+#include "text.h"
 
 bool instanceFlag = false;
 game* game::instance = nullptr;
 
-const int damage = 10;
-const int bomb_damage = 30;
+const int HP = 400;
+const int scalar = 1;
+
+const int damage = HP/20; // damage of bullet in HP
+const int bomb_damage = damage * 3;
+const int bullet_damage_weight = 1;// damage of bullet in TEXT
+const int bomb_damage_weight = 3;
 
 const int STAY = 100;
 
@@ -130,7 +137,7 @@ bool game::init(){
  * handles the internal game logic and rendering of the game
  */
 void game::run(){
-
+HERE:
     playerTexture oneTexture;
     playerTexture twoTexture;
     playerTexture projectile;
@@ -144,19 +151,19 @@ void game::run(){
     twoTexture.loadImage("player2.bmp", gameRenderer);
     projectile.loadImage("dot.bmp", gameRenderer);
 	flameTexture.loadImage("flame.bmp", gameRenderer);
-    hp_red_texture.loadImage("player1.bmp", gameRenderer);
-    hp1_texture.loadImage("player1.bmp", gameRenderer);
-    hp2_texture.loadImage("player1.bmp", gameRenderer);
+    hp_red_texture.loadImage("player1.bmp", gameRenderer, HP, scalar);
+    hp1_texture.loadImage("player1.bmp", gameRenderer, HP, scalar);
+    hp2_texture.loadImage("player1.bmp", gameRenderer, HP, scalar);
     hp1_texture.setColour(50, 205, 50);
     hp2_texture.setColour(50, 205, 50);
 
-    player square1(1286,384, &oneTexture);
-    player square2(50,384, &twoTexture);
+    player square1(SCREEN_WIDTH - 80,SCREEN_HEIGHT/2, &oneTexture, HP);
+    player square2(80,SCREEN_HEIGHT/2, &twoTexture, HP);
     
     Health hp1_red(50, 50, &hp_red_texture);
-    Health hp2_red(SCREEN_WIDTH - 300, 50, &hp_red_texture);
+    Health hp2_red(SCREEN_WIDTH - hp1_texture.getHpWidth() - 50, 50, &hp_red_texture);
     Health hp1_green(50, 50, &hp1_texture);
-    Health hp2_green(SCREEN_WIDTH - 300, 50, &hp2_texture);
+    Health hp2_green(SCREEN_WIDTH - hp1_texture.getHpWidth() - 50, 50, &hp2_texture);
 
 	// instance of BULLET
     std::vector<bullet*> p1bullets;
@@ -174,6 +181,28 @@ void game::run(){
 	bomb* p1bomb = nullptr;
 	bomb* p2bomb = nullptr;
 
+	// instance of font
+	TTF_Init();
+
+	SDL_Color color;
+	color.r = 100;
+	color.b = 0;
+	color.g = 0;
+	int num_hit = HP / 5;
+	Text *p1Texts[num_hit+1];
+	Text *p2Texts[num_hit+1];
+	int HP_remaining = HP;
+	int p1_HP = 0;
+	int p2_HP = 0;
+	for (int i = 0; i < num_hit; i++)
+	{
+		auto s = std::to_string(HP_remaining);
+		p1Texts[i] = new Text(gameRenderer, "Roboto-Regular.ttf", 36, s, color);
+		p2Texts[i] = new Text(gameRenderer, "Roboto-Regular.ttf", 36, s, color);
+		HP_remaining -= damage;
+	}
+
+	// Main part
     bool quit = false;
     SDL_Event event;
 
@@ -187,11 +216,13 @@ void game::run(){
     int PlayerTwolastTime = 0;
     int PlayerTwoaccumulator = 0;
   
-    //While user does not quit
+	// this is for some object that will stay in screen for seconds
 	bool stay_1_bool = false;
 	int stay_1_time = STAY;
 	bool stay_2_bool = false;
 	int stay_2_time = STAY;
+
+	//While user does not quit
 	while( !quit ){
         
         int p1XPos = square1.getXCoord();
@@ -299,19 +330,20 @@ void game::run(){
         //Render the players in their new positions
         square1.render(gameRenderer);
         square2.render(gameRenderer);
-        
+
+		//Render the players in their new positions
+		square1.render(gameRenderer);
+		square2.render(gameRenderer);
+
         hp1_red.render(gameRenderer);
         hp2_red.render(gameRenderer);
         hp1_green.render(gameRenderer);
         hp2_green.render(gameRenderer);
-        
-        if (square1.getHealth() <= 0 || square2.getHealth() <= 0) {
-            std::cout << "Player 1: " << square1.getHealth() << std::endl;
-            std::cout << "Player 2: " << square2.getHealth() << std::endl;
-            exit(0);
-        }
-        
-        // Loops through all of player 1's bullets and updates each one individually 
+
+		p1Texts[p1_HP]->display(hp1_red.getXCoord(), hp1_red.getYCoord() + hp1_red.getHeight(), gameRenderer);
+		p2Texts[p2_HP]->display(hp2_red.getXCoord(),hp2_red.getYCoord()+hp1_red.getHeight(),gameRenderer);
+
+        // bullet, p1
         for (int i = 0; i < (int)p1bullets.size(); i++) {
             if( p1bool[i] ){
                 (*p1bullets[i]).shoot((*p1bullets[i]).getX(), (*p1bullets[i]).getY());
@@ -321,8 +353,11 @@ void game::run(){
                     
                     if (projectileCollision(square2, p1bullets[i])) {
                         square2.setHealth(square2.getHealth() - damage);
-                        std::cout << "Player 2 took 10 damage: " << square2.getHealth() << std::endl;
-                        hp1_texture.setWidth(hp1_texture.getHpWidth()  - 25);
+                        // std::cout << "Player 2 took 10 damage: " << square2.getHealth() << std::endl;
+	                    // for hp text
+                        p1_HP+=bullet_damage_weight;
+                        // for hp bar
+	                    hp1_texture.addWidth(- damage);
                     }
                 }
                 
@@ -331,9 +366,12 @@ void game::run(){
                     
                     if (projectileCollision(square2, p1bullets[i])) {
                         square2.setHealth(square2.getHealth() - damage);
-                        std::cout << "Player 2 took 10 damage: " << square2.getHealth() << std::endl;
-                        hp1_texture.setWidth(hp1_texture.getHpWidth() - 25);
-                        std::cout << "ERROR" << std::endl;
+                        // std::cout << "Player 2 took 10 damage: " << square2.getHealth() << std::endl;
+	                    // for hp text
+	                    p1_HP+=bullet_damage_weight;
+                        // for hp bar
+	                    hp1_texture.addWidth(- damage);
+
                     }
                 }
                 
@@ -348,7 +386,7 @@ void game::run(){
             }
         }
         
-        // Loops through all of player 2's bullets and updates each one individually 
+        // bullet, p2
         for (int i = 0; i < (int)p2bullets.size(); i++) {
             if( p2bool[i] ){
                 (*p2bullets[i]).shoot((*p2bullets[i]).getX(), (*p2bullets[i]).getY());
@@ -358,8 +396,10 @@ void game::run(){
                     
                     if (projectileCollision(square1, p2bullets[i])) {
                         square1.setHealth(square1.getHealth() - damage);
-                        std::cout << "Player 1 took 10 damage: " << square1.getHealth() << std::endl;
-                        hp2_texture.setWidth(hp2_texture.getHpWidth()  - 25);
+	                    // for HP text
+	                    p2_HP+=bullet_damage_weight;
+                        // for HP bar
+	                    hp2_texture.addWidth( - damage);
                     }
 
                 }
@@ -368,10 +408,12 @@ void game::run(){
                     
                     if (projectileCollision(square1, p2bullets[i])) {
                         square1.setHealth(square1.getHealth() - damage);
-                        std::cout << "Player 1 took 10 damage: " << square1.getHealth() << std::endl;
-                        hp2_texture.setWidth(hp2_texture.getHpWidth()  - 25);
+                        // std::cout << "Player 1 took 10 damage: " << square1.getHealth() << std::endl;
+	                    // for HP text
+	                    p2_HP+=bullet_damage_weight;
+	                    // for HP bar
+	                    hp2_texture.addWidth(- damage);
                     }
-
                 }
                 
                 if(!p2bool[i]){
@@ -385,7 +427,7 @@ void game::run(){
             }
         }
 
-		// loop BUMB p1
+		// bomb p1
 		int x_1, y_1;
 		if(stay_1_bool && stay_1_time > 0)
 		{
@@ -402,9 +444,11 @@ void game::run(){
 				{
 					p1_bomb_bool[i] = false;
 					if (projectileExploded(square2, p1bomb_list[i])) {
-						square2.setHealth(square2.getHealth() - bomb_damage);
-						std::cout << "Player 2 took " << bomb_damage << " damage: " << square2.getHealth() << std::endl;
-						hp1_texture.setWidth(hp1_texture.getHpWidth()  - 25 * 3);
+						square2.setHealth(square2.getHealth()- bomb_damage);
+						// for HP text
+						p1_HP+=bomb_damage_weight;
+						// for HP bar
+						hp1_texture.addWidth(- bomb_damage);
 					}
 				}
 
@@ -413,8 +457,10 @@ void game::run(){
 					p1_bomb_bool[i] = false;
 					if (projectileExploded(square1, p1bomb_list[i])) {
 						square2.setHealth(square2.getHealth() - bomb_damage);
-						std::cout << "Player 2 took " << bomb_damage << " damage: " << square2.getHealth() << std::endl;
-						hp1_texture.setWidth(hp1_texture.getHpWidth()  - 25 * 3);
+						// for HP text
+						p1_HP+=bomb_damage_weight;
+						// for HP bar
+						hp1_texture.addWidth(- bomb_damage);
 					}
 				}
 
@@ -432,7 +478,7 @@ void game::run(){
 			}
 		}
 
-	    // loop BUMB p2
+	    // bomb, p2
 	    int x_2, y_2;
 	    if(stay_2_bool && stay_2_time > 0)
 	    {
@@ -450,8 +496,10 @@ void game::run(){
 				    p2_bomb_bool[i] = false;
 				    if (projectileExploded(square1, p2bomb_list[i])) {
 					    square1.setHealth(square1.getHealth() - bomb_damage);
-					    std::cout << "Player 1 took " << bomb_damage << " damage: " << square1.getHealth() << std::endl;
-					    hp2_texture.setWidth(hp2_texture.getHpWidth()  - 25 * 3);
+					    // for HP text
+					    p2_HP+=bomb_damage_weight;
+					    // for HP bar
+					    hp2_texture.addWidth(- bomb_damage);
 				    }
 			    }
 
@@ -460,8 +508,10 @@ void game::run(){
 				    p2_bomb_bool[i] = false;
 				    if (projectileExploded(square1, p2bomb_list[i])) {
 					    square1.setHealth(square1.getHealth() - bomb_damage);
-					    std::cout << "Player 1 took " << bomb_damage << " damage: " << square1.getHealth() << std::endl;
-					    hp2_texture.setWidth(hp2_texture.getHpWidth()  - 25 * 3);
+					    // for HP text
+					    p2_HP+=bomb_damage_weight;
+					    // for HP bar
+					    hp2_texture.addWidth(- bomb_damage);
 				    }
 			    }
 
@@ -478,16 +528,40 @@ void game::run(){
 		    }
 	    }
 
-        //Update the game screen
-        SDL_RenderPresent(gameRenderer);
+	    // end of game
+		if (square1.getHealth() <= 0 || square2.getHealth() <= 0) {
+
+			bool running = true;
+			SDL_RenderPresent(gameRenderer);
+			while (running)
+			{
+				while (SDL_PollEvent(&event))
+				{
+					if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_x )
+					{
+						exit(0);
+					}
+					if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_r )
+					{
+						running = false;
+
+						goto HERE;
+					}
+				}
+			}
+		}
+		//Update the game screen
+		SDL_RenderPresent(gameRenderer);
     }
 
-    oneTexture.free();
-    twoTexture.free();
-    projectile.free();
-    hp_red_texture.free();
-    hp1_texture.free();
-    hp2_texture.free();
+	std::cout << "exit" << std::endl;
+
+	oneTexture.free();
+	twoTexture.free();
+	projectile.free();
+	hp_red_texture.free();
+	hp1_texture.free();
+	hp2_texture.free();
 }
 
 int game::getScrnHeight(){

@@ -9,8 +9,8 @@
  */
 Health::Health(int startX, int startY, HealthTexture* hpTxt){
 	hpTexture = hpTxt;
-	width = 100;
-	height = 35;
+	width = hpTxt->getHpWidth();
+	height = hpTxt->getHpHeight();
 	xPosition = startX;
 	yPosition = startY;
 }
