@@ -1,6 +1,6 @@
 # Color Shooting
 
-## SEE DEMO FIRST and tell me HOW YOU LIKE MY MUSIC!!!
+## ***SEE DEMO FIRST and tell me HOW YOU LIKE MY MUSIC!!!***
 
 ## how to compile
 
