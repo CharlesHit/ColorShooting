@@ -1,7 +1,13 @@
-//
-// Created by Christopher Xu on 2019-10-26.
-// Reviewed by Charles on 2019-11-4.
-//
+/**
+ * @brief this class initializes an instance of game class and handles the game logic
+ * @authors Christopher Xu, Ivgeni Darinski, Xinwen Liang, Mu He, Nicholas Meisner
+ *
+ * this class initializes all the textures for the players and projectiles and
+ * imports all the SDL media libraries. it also determines the coordinates of the projectiles
+ * and players and renders them on the screen. it also renders health bar and hit points for
+ * each player
+ *
+ */
 
 #include <vector>
 
@@ -13,6 +19,7 @@
 
 bool instanceFlag = false;
 game * game::instance = nullptr;
+Mix_Chunk * backgroundSound = nullptr;
 
 const int HP = 400;
 const int scalar = 1;
@@ -127,6 +134,11 @@ bool game::init ()
 			SDL_RenderClear(gameRenderer);
 
 			SDL_RenderPresent(gameRenderer);
+
+			if ( Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0 )
+			{
+				printf("Music could not initialize! Music Error: %s\n", Mix_GetError());
+			}
 		}
 	}
 
@@ -140,22 +152,31 @@ bool game::init ()
 void game::run ()
 {
 HERE:
+	// texture
 	playerTexture Texture_R;
 	playerTexture Texture_L;
 	playerTexture Texture_bullet;
 	playerTexture Texture_bomb; // for bomb
 
+	// music
+	SDL_AudioDeviceID deviceId;
+	SDL_AudioSpec wavSpec;
+	Uint32 wavLength;
+	Uint8 *wavBuffer;
+
+	// hp boxes
 	HPBox Texture_red;
 	HPBox HPBox_Left;
 	HPBox HPBox_Right;
 
-	Texture_R.loadImage("assert/player_R.bmp", gameRenderer);
-	Texture_L.loadImage("assert/player_L.bmp", gameRenderer);
-	Texture_bullet.loadImage("assert/dot.bmp", gameRenderer);
-	Texture_bomb.loadImage("assert/flame.bmp", gameRenderer);
-	Texture_red.loadImage("assert/player_R.bmp", gameRenderer, HP, scalar);
-	HPBox_Left.loadImage("assert/player_R.bmp", gameRenderer, HP, scalar);
-	HPBox_Right.loadImage("assert/player_R.bmp", gameRenderer, HP, scalar);
+	// asset loading
+	Texture_R.loadImage("asset/player_R.bmp", gameRenderer);
+	Texture_L.loadImage("asset/player_L.bmp", gameRenderer);
+	Texture_bullet.loadImage("asset/dot.bmp", gameRenderer);
+	Texture_bomb.loadImage("asset/flame.bmp", gameRenderer);
+	Texture_red.loadImage("asset/player_R.bmp", gameRenderer, HP, scalar);
+	HPBox_Left.loadImage("asset/player_R.bmp", gameRenderer, HP, scalar);
+	HPBox_Right.loadImage("asset/player_R.bmp", gameRenderer, HP, scalar);
 	HPBox_Left.setColour(50, 205, 50);
 	HPBox_Right.setColour(50, 205, 50);
 
@@ -198,9 +219,32 @@ HERE:
 	for ( int i = 0; i < damage_each_hit; i++ )
 	{
 		auto s = std::to_string(HP_remaining);
-		Score_R[i] = new Text(gameRenderer, "assert/Roboto-Regular.ttf", 36, s, color);
-		Score_L[i] = new Text(gameRenderer, "assert/Roboto-Regular.ttf", 36, s, color);
+		Score_R[i] = new Text(gameRenderer, "asset/Roboto-Regular.ttf", 36, s, color);
+		Score_L[i] = new Text(gameRenderer, "asset/Roboto-Regular.ttf", 36, s, color);
 		HP_remaining -= damage;
+	}
+
+	// text for wining screen
+	Text * L_wins;
+	Text * R_wins;
+	Text * restartText;
+
+	// Music upload
+	try
+	{
+		SDL_Init(SDL_INIT_AUDIO);
+
+		SDL_LoadWAV("asset/6-final-screen.wav", &wavSpec, &wavBuffer, &wavLength);
+
+		deviceId = SDL_OpenAudioDevice(nullptr, 0, &wavSpec, nullptr, 0);
+
+		int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
+		SDL_PauseAudioDevice(deviceId, 0);
+	}
+	catch ( int e )
+	{
+		std::cout << "Huh! No music! - " << Mix_GetError() << std::endl;
+		exit(1);
 	}
 
 	// Environment Setting
@@ -220,6 +264,10 @@ HERE:
 	int stay_R_time = MAX_STAY_time;
 	bool stay_L = false;
 	int stay_L_time = MAX_STAY_time;
+
+	// final decider
+	bool R_lost = false;
+	bool L_lost = false;
 
 	//While user does not quit
 	while ( !quit )
@@ -331,6 +379,86 @@ HERE:
 		                                   gameRenderer);
 		Score_L[TotalDamage_Right]->display(HP_L_red.getXCoord(), HP_L_red.getYCoord() + HP_R_red.getHeight(),
 		                                    gameRenderer);
+
+		// score check and end game decider
+		if ( L.getHealth() <= 0 )
+		{
+			L_lost = true;
+			TotalDamage_Left = 0;
+			try
+			{
+				L_wins = new Text(gameRenderer, "asset/Roboto-Regular.ttf", 80, "Right guy wins!", color);
+				restartText = new Text(gameRenderer, "asset/Roboto-Regular.ttf", 80, "Play again ? (y/n)", color);
+			} catch ( int e )
+			{
+				std::cout << "Victory Font for Right guy error" << std::endl;
+				exit(1);
+			}
+			L_wins->display(400, 300, gameRenderer);
+			restartText->display(400, 500, gameRenderer);
+			Mix_Volume(-1, MIX_MAX_VOLUME / 6);
+			Mix_PlayChannel(-1, backgroundSound, 0);
+		}
+
+		if ( R.getHealth() <= 0 )
+		{
+			R_lost = true;
+			TotalDamage_Right = 0;
+			try
+			{
+				R_wins = new Text(gameRenderer, "asset/Roboto-Regular.ttf", 80, "Left guys wins!", color);
+				restartText = new Text(gameRenderer, "asset/Roboto-Regular.ttf", 80, "Play again(y/n)", color);
+			}
+			catch ( int e )
+			{
+				std::cout << "Victory Font for Left guy error" << std::endl;
+				exit(1);
+			}
+			R_wins->display(400, 300, gameRenderer);
+			restartText->display(400, 500, gameRenderer);
+			Mix_Volume(-1, MIX_MAX_VOLUME / 6);
+			Mix_PlayChannel(-1, backgroundSound, 0);
+		}
+
+		if ( L_lost )
+		{
+			L.setXCoord(15000);
+			L.setYCoord(15000);
+		}
+
+		if ( R_lost )
+		{
+			R.setXCoord(15000);
+			R.setYCoord(15000);
+		}
+
+		//Render the players in their new positions
+		R.render(gameRenderer);
+		L.render(gameRenderer);
+
+
+		if ( R.getHealth() <= 0 || L.getHealth() <= 0 )
+		{
+
+			SDL_RenderPresent(gameRenderer);
+			while ( true )
+			{
+				while ( SDL_PollEvent(&event))
+				{
+					if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_n )
+					{
+						exit(0);
+					}
+					if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_y )
+					{
+
+						Mix_HaltChannel(-1);
+
+						goto HERE;
+					}
+				}
+			}
+		}
 
 		// bullet, R
 		for ( int i = 0; i < ( int ) bullets_R.size(); i++ )
@@ -611,30 +739,12 @@ HERE:
 			}
 		}
 
-		// end of game
-		if ( R.getHealth() < 0 || L.getHealth() < 0 )
-		{
-			//Clear the screen to remove the players' previous positions
-			SDL_SetRenderDrawColor(gameRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-			SDL_RenderClear(gameRenderer);
-			while ( true )
-			{
-				while ( SDL_PollEvent(&event))
-				{
-					if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_x )
-					{
-						exit(0);
-					}
-					if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_r )
-					{
-						goto HERE;
-					}
-				}
-			}
-		}
 		//Update the game screen
 		SDL_RenderPresent(gameRenderer);
 	}
+
+	SDL_CloseAudioDevice(deviceId);
+	SDL_FreeWAV(wavBuffer);
 
 	std::cout << "exit" << std::endl;
 
@@ -678,7 +788,7 @@ bool game::bombExploded ( player p, player p2, bomb * b )
 //	std::cout << b->getExplodingRange() * b->getExplodingRange() << std::endl;
 	return (( b->getX() - p.getXCoord()) * ( b->getX() - p.getXCoord()) +
 	        ( b->getY() - p.getYCoord()) * ( b->getY() - p.getYCoord()))
-	       <= bomb_explode*bomb_explode;
+	       <= bomb_explode * bomb_explode;
 }
 
 /**
