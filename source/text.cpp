@@ -20,7 +20,9 @@ SDL_Texture * Text::loadFont(SDL_Renderer *renderer, const std::string &font_pat
 	
 	TTF_Font *font = TTF_OpenFont(font_path.c_str(), font_size);
 	if (!font) {
-		std::cerr << "Failed to load font!\n";
+		std::cerr << "In text:cpp:23: loadFont: Failed to load font! " << font_path.c_str() << "\n";
+
+		exit(1);
 	}
 	
 	auto text_surface = TTF_RenderText_Solid(font, text.c_str(), color);

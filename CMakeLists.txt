@@ -2,7 +2,7 @@ project(ColorShooting)
 
 cmake_minimum_required(VERSION 3.15)
 
-# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../${CMAKE_DIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}")
 
 include_directories(
         ${PROJECT_SOURCE_DIR}/header
