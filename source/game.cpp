@@ -219,8 +219,15 @@ HERE:
 	for ( int i = 0; i < damage_each_hit; i++ )
 	{
 		auto s = std::to_string(HP_remaining);
-		Score_R[i] = new Text(gameRenderer, "asset/Roboto-Regular.ttf", 36, s, color);
-		Score_L[i] = new Text(gameRenderer, "asset/Roboto-Regular.ttf", 36, s, color);
+
+		try {
+			Score_R[i] = new Text(gameRenderer, "Roboto-Regular.ttf", 36, s, color);
+			Score_L[i] = new Text(gameRenderer, "Roboto-Regular.ttf", 36, s, color);
+		} catch (int e)
+		{
+			std::cout << "Line 228: Failed to load font!" << std::endl;
+			exit(1);
+		}
 		HP_remaining -= damage;
 	}
 

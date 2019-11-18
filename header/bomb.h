@@ -2,8 +2,8 @@
 // Created by Charles on 2019-11-04.
 //
 
-#ifndef TEAM16_BOMB_H
-#define TEAM16_BOMB_H
+#ifndef COLORSHOOTING_BOMB_H
+#define COLORSHOOTING_BOMB_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -64,4 +64,4 @@ private:
 	playerTexture * flameTexture;
 };
 
-#endif //TEAM16_BOMB_H
+#endif //COLORSHOOTING_BOMB_H

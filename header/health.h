@@ -1,5 +1,5 @@
-#ifndef TEAM16_HEALTH_H
-#define TEAM16_HEALTH_H
+#ifndef COLORSHOOTING_HEALTH_H
+#define COLORSHOOTING_HEALTH_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -24,4 +24,4 @@ class Health{
 		int height;
 		HPBox* hpTexture;
 };
-#endif //TEAM16_HEALTH_H
+#endif //COLORSHOOTING_HEALTH_H

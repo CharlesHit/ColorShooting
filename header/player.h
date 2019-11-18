@@ -1,12 +1,9 @@
 //
 // Created by Christopher Xu on 2019-10-26.
 //
-/* Code by: Group 16
- * Date: October 24, 2019
- */
 
-#ifndef TEAM16_PLAYER_H
-#define TEAM16_PLAYER_H
+#ifndef COLORSHOOTING_PLAYER_H
+#define COLORSHOOTING_PLAYER_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -45,4 +42,4 @@ private:
     playerTexture* pTexture;
 };
 
-#endif //TEAM16_PLAYER_H
+#endif //COLORSHOOTING_PLAYER_H

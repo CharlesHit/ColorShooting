@@ -1,5 +1,5 @@
-#ifndef TEAM16_TEXT_H
-#define TEAM16_TEXT_H
+#ifndef COLORSHOOTING_TEXT_H
+#define COLORSHOOTING_TEXT_H
 
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL.h>
@@ -16,5 +16,5 @@ class Text {
 		SDL_Texture *_text_texture = nullptr;
 		mutable SDL_Rect _text_rect;
 };
-#endif //TEAM16_TEXT_H
+#endif //COLORSHOOTING_TEXT_H
 

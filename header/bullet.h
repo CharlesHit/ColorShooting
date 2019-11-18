@@ -2,8 +2,8 @@
 // Created by Christopher Xu on 2019-10-26.
 //
 
-#ifndef TEAM16_BULLET_H
-#define TEAM16_BULLET_H
+#ifndef COLORSHOOTING_BULLET_H
+#define COLORSHOOTING_BULLET_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -35,4 +35,4 @@ private:
     playerTexture* pTexture;
 };
 
-#endif //TEAM16_BULLET_H
+#endif //COLORSHOOTING_BULLET_H

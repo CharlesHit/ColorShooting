@@ -1,5 +1,5 @@
-#ifndef TEAM16_GAME_H
-#define TEAM16_GAME_H
+#ifndef COLORSHOOTING_GAME_H
+#define COLORSHOOTING_GAME_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -33,4 +33,4 @@ class game{
   		static bool projectileCollision(player p, bullet* b);
 		static bool bombExploded ( player p, player, bomb * b );
 };
-#endif //TEAM16_GAME_H
+#endif //COLORSHOOTING_GAME_H

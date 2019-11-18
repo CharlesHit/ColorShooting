@@ -1,8 +1,8 @@
-/* Code by: Group 16
+/*
  * Date: October 25, 2019
  */
-#ifndef TEAM16_PLAYERTEXTURE_H
-#define TEAM16_PLAYERTEXTURE_H
+#ifndef COLORSHOOTING_PLAYERTEXTURE_H
+#define COLORSHOOTING_PLAYERTEXTURE_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -24,4 +24,4 @@ class playerTexture{
 			int txtWidth;
 			int txtHeight;
 };
-#endif //TEAM16_PLAYERTEXTURE_H
+#endif //COLORSHOOTING_PLAYERTEXTURE_H

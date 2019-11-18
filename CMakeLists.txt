@@ -33,7 +33,7 @@ find_library(4_LIB SDL2_mixer)
 
 add_executable(ColorShooting source/text.cpp source/game.cpp source/player.cpp source/playerTexture.cpp source/bullet.cpp source/health.cpp source/HPbox.cpp source/bomb.cpp)
 
-target_link_libraries(team16 "${1_LIB}")
-target_link_libraries(team16 "${2_LIB}")
-target_link_libraries(team16 "${3_LIB}")
-target_link_libraries(team16 "${4_LIB}")
+target_link_libraries(ColorShooting "${1_LIB}")
+target_link_libraries(ColorShooting "${2_LIB}")
+target_link_libraries(ColorShooting "${3_LIB}")
+target_link_libraries(ColorShooting "${4_LIB}")

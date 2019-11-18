@@ -1,5 +1,5 @@
-#ifndef TEAM16_HPBOX_H
-#define TEAM16_HPBOX_H
+#ifndef COLORSHOOTING_HPBOX_H
+#define COLORSHOOTING_HPBOX_H
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -26,4 +26,4 @@ class HPBox {
 		
 };
 
-#endif //TEAM16_HPBOX_H
+#endif //COLORSHOOTING_HPBOX_H
