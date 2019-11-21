@@ -234,7 +234,7 @@ HERE:
 	{
 		SDL_Init(SDL_INIT_AUDIO);
 
-		SDL_LoadWAV("Demo & OST/6-final-screen.wav", &wavSpec, &wavBuffer, &wavLength);
+		SDL_LoadWAV("Demo & Music/6-final-screen.wav", &wavSpec, &wavBuffer, &wavLength);
 
 		deviceId = SDL_OpenAudioDevice(nullptr, 0, &wavSpec, nullptr, 0);
 
